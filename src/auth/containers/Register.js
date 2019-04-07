@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
 
+import { registerUser } from '../actions'
 
 class Register extends Component {
 
@@ -15,12 +17,29 @@ class Register extends Component {
   }
 
   handleSubmit = (event) => {
+    this.props.registerUser(this.state);
     event.preventDefault()
+  }
+
+  renderIndicator = () => {
+    if (this.props.isLoading) {
+      return <div><span style={{ color: 'green' }}>Loading...</span></div>
+    }
+    return null
+  }
+
+  renderError = () => {
+    if (this.props.hasError) {
+      return <div><span style={{ color: 'red' }}>Error</span></div>
+    }
+    return null
   }
 
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
+        {this.renderIndicator()}
+        {this.renderError()}
         <div>
           <input onChange={this.handleChange} type="email" name="email" value={this.state.email} placeholder="E-mail" />
         </div>
@@ -41,4 +60,14 @@ class Register extends Component {
   }
 }
 
-export default Register;
+const mapStateToProps = state => ({
+  isLoading: state.auth.isLoading,
+  hasError: state.auth.hasError
+})
+
+
+const mapDispatchToProps = dispatch => ({
+  registerUser: (formData) => dispatch(registerUser(formData))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register);
